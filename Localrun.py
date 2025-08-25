@@ -1,12 +1,9 @@
-from flask_cors import CORS
-from flask import Flask, request, jsonify
-import random
 
-app = Flask(__name__)
-CORS(app)
+import random
 
 Money = 800  # Starting money for pistol round
 
+Side = input("Enter your side (CT or T): ").strip().upper() 
 # CS2 pistol round buy options
 ct_pistol_round_buys = {
     "P250" : 300,            # $300
@@ -32,28 +29,16 @@ t_pistol_round_buys = {
     "HE Grenade": 300,     # $300
     "Decoy Grenade": 50    # $50
 }
+if Side == "CT":
+    buy_list = ct_pistol_round_buys
+elif Side == "T":
+    buy_list = t_pistol_round_buys
+else:
+    print("Invalid side entered. Please enter CT or T.")
+    exit()
 
-@app.route('/random-buy', methods=['POST'])
-
-def random_buy():
-    data = request.json
-    side = data.get('side', '').upper()
-    money = data.get('money', 800)
-    
-    random_list = []
-    
-    if side == "CT":
-        buy_list = ct_pistol_round_buys
-    else:
-        buy_list = t_pistol_round_buys
-
-    while money > 0:
-        output = random.choice(list(buy_list.items()))
-        if output[1] <= money:
-            random_list.append({"item": output[0], "price": output[1]})
-            money -= output[1]
-        
-    return jsonify(random_list)
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
+while True:
+    output = random.choice(list(buy_list.items()))
+    if output[1] <= Money:
+        print(f"Random buy option for {Side}: {output[0]} (${output[1]})")
+    Money -= output[1]
